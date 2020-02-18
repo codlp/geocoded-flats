@@ -1,0 +1,35 @@
+import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
+
+const fitMapToMarkers = (map, markers) => {
+  const bounds = new mapboxgl.LngLatBounds();
+  markers.forEach(marker => bounds.extend([ marker.lng, marker.lat ]));
+  map.fitBounds(bounds, { padding: 70, maxZoom: 15, duration: 0 });
+};
+
+const addMarkersToMap = (map, markers) => {
+  const mapElement = document.getElementById("map");
+  if (mapElement) {
+    const markers = JSON.parse(mapElement.dataset.markers);
+    markers.forEach((marker) => {
+      const popup = new mapboxgl.Popup().setHTML(marker.infoWindow); // add this
+      new mapboxgl.Marker()
+        .setLngLat([ marker.lng, marker.lat ])
+        .setPopup(popup) // add this
+        .addTo(map);
+    });
+  }
+}
+
+const initMapbox = () => {
+  mapboxgl.accessToken = 'pk.eyJ1IjoiY29yYWxpZWRlbHBoYSIsImEiOiJjanJ1aDRkd2kweWI1NDRtaTk4N2I1ZHJlIn0.9oQDlKfcOgH4v4KZA6bo8w';
+  const mapElement = document.getElementById("map");
+  const markers = JSON.parse(mapElement.dataset.markers);
+  const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/streets-v11'
+  });
+  addMarkersToMap(map, markers);
+  fitMapToMarkers(map, markers);
+}
+
+export { initMapbox };
